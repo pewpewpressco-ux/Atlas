@@ -1,0 +1,29 @@
+class WeeklyResearch(Workflow):
+
+    name = "weekly-research"
+
+    trigger = "schedule"
+
+    departments = [
+
+        "Knowledge",
+
+        "Research"
+
+    ]
+
+    def execute(self, atlas):
+
+        atlas.run_department(
+
+            "Knowledge"
+
+        )
+
+        atlas.run_department(
+
+            "Research"
+
+        )
+
+        atlas.save()
