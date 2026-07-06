@@ -1,0 +1,25 @@
+class PromotionReview(Workflow):
+
+    name = "promotion-review"
+
+    trigger = "event"
+
+    departments = [
+
+        "Validation",
+
+        "Operations",
+
+        "Knowledge"
+
+    ]
+
+    def execute(self, atlas):
+
+        atlas.run_department("Validation")
+
+        atlas.run_department("Operations")
+
+        atlas.run_department("Knowledge")
+
+        atlas.save()
