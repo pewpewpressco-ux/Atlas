@@ -1,29 +1,19 @@
-# Knowledge Department
+# Atlas Knowledge System
 
-Mission
+The Knowledge System transforms information into institutional intelligence.
 
-Create institutional memory.
+Atlas does not simply store documents.
 
-Atlas improves by remembering.
+Atlas stores relationships.
 
-Knowledge transforms experience into reusable intelligence.
+Every artifact entering Atlas becomes part of a connected body of evidence.
 
-Nothing valuable is discarded.
+The purpose of the Knowledge System is to ensure that:
 
-Failures possess equal value to successes.
+- Nothing valuable is forgotten.
+- Every conclusion is traceable.
+- Every strategy has lineage.
+- Every experiment contributes knowledge.
+- Every failure improves future decisions.
 
----
-
-Responsibilities
-
-Maintain indexes.
-
-Cross-reference reports.
-
-Version strategies.
-
-Archive retired work.
-
-Generate summaries.
-
-Maintain knowledge graph.
+The Librarian is the steward of this system.
