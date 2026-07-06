@@ -1,0 +1,40 @@
+market_open.py
+from framework.workflows.base import Workflow
+
+from framework.workflows.registry import register
+
+
+class MarketOpen(Workflow):
+
+    name = "market-open"
+
+    trigger = "schedule"
+
+    departments = [
+
+        "Knowledge",
+
+        "Research",
+
+        "Operations",
+
+        "Validation"
+
+    ]
+
+    def execute(self, atlas):
+
+        atlas.load_memory()
+
+        atlas.run_department("Knowledge")
+
+        atlas.run_department("Research")
+
+        atlas.run_department("Operations")
+
+        atlas.run_department("Validation")
+
+        atlas.save()
+
+
+register(MarketOpen())
