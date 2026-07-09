@@ -1,374 +1,310 @@
-# Atlas Engineering Handoff
+# Atlas Session Handoff
 
-## Session Purpose
+## Current Repository State
 
-This session performed an architectural audit of the Atlas repository before additional feature implementation.
+Repository:
+`pewpewpressco-ux/Atlas`
 
-The repository was treated as the source of truth. The audit focused on:
+Session focus:
+Artifact Framework discovery and implementation planning.
 
-- architecture consistency
-- governance alignment
-- domain modeling
-- Artifact Framework integrity
-- technical debt risks
-- remediation priorities
+No code changes were made during this session.
 
-No feature development was performed.
+The repository was successfully inspected locally and the existing Artifact architecture was mapped.
 
 ---
 
-# Current Repository State
+# Completed Work
 
-Atlas is currently in the foundational domain modeling phase.
+## Repository Discovery
 
-The repository has begun implementing core concepts including:
+Confirmed repository structure:
 
-- Artifact Framework
-- validation
-- serialization
-- repository persistence
-- domain primitives
+```
+framework/
+└── artifacts/
+    ├── artifact.py
+    ├── enums.py
+    ├── factory.py
+    ├── relationships.py
+    ├── repository.py
+    ├── serializer.py
+    └── validator.py
+```
 
-The overall architectural direction is correct, but several foundational contracts need to be hardened before expanding functionality.
-
----
-
-# Major Audit Findings
-
-## 1. Governance Layer Gap
-
-### Finding
-
-Atlas architecture references governance concepts that are not yet fully represented in repository documentation.
-
-Missing or inconsistent governance artifacts:
-
-- AGENTS.md
-- docs/CONSTITUTION.md
-- docs/ARCHITECTURE.md naming normalization
-- docs/ROADMAP.md
-- docs/DECISIONS.md
-- docs/HANDOFF.md
-
-### Why This Matters
-
-Atlas is intended to be an evidence-driven autonomous trading platform. Without repository-level governance, future development decisions become dependent on conversation history instead of durable project authority.
-
-Architecture decisions, capital rules, and operational constraints must exist in the repository.
-
-### Recommendation
-
-Establish documentation as a first-class product component before significant implementation expansion.
+The Artifact Framework already exists and should be enhanced rather than replaced.
 
 ---
 
-# Artifact Framework Audit
+# Current Artifact Architecture Assessment
 
-## Overall Decision
+Current flow:
 
-KEEP THE ARTIFACT FRAMEWORK CONCEPT.
+```
+Department
+    ↓
+ArtifactFactory
+    ↓
+Artifact
+    ↓
+ArtifactSerializer
+    ↓
+ArtifactRepository
+    ↓
+YAML Storage
+```
 
-The architecture is correct. The implementation requires hardening.
+The architecture boundary is correct.
 
-The Artifact should become the immutable, versioned, evidence-backed state transition object used by every Atlas service.
-
-The intended service pattern:
-
-Input Artifact
-
-↓
-
-Process
-
-↓
-
-New Artifact
-
-Services should not mutate shared state.
-
----
-
-# Artifact Framework Findings
-
-## Finding 1 — Artifact Mutability
-
-### Current Risk
-
-Artifact objects are mutable.
-
-### Why This Matters
-
-Evidence systems require historical truth. A validated artifact must not silently change after approval.
-
-Mutation destroys reproducibility.
-
-### Recommendation
-
-Convert Artifact into an immutable object.
-
-Use versioned artifact creation instead of mutation.
-
-Example lifecycle:
-
-Artifact v1
-
-↓
-
-Artifact v2
+Primary issue:
+The Artifact model is currently a lightweight schema and does not yet provide the guarantees required for a production evidence-driven system.
 
 ---
 
-## Finding 2 — Evidence Model Is Too Weak
+# Findings
 
-### Current Risk
+## Artifact Model
 
-Evidence is represented as a simple string value.
+Current implementation:
 
-### Why This Matters
+* mutable dataclass
+* string-based type/status fields
+* weak evidence representation
+* no integrity hashing
+* mutable metadata/content containers
 
-Evidence is a core Atlas concept. It requires provenance, confidence, source information, methodology, and timestamps.
+Required improvements:
 
-A string cannot enforce evidence quality.
-
-### Recommendation
-
-Create a dedicated EvidenceRecord model.
-
-Evidence should include:
-
-- source
-- confidence
-- collection timestamp
-- methodology
-- artifact linkage/hash
+* immutable Artifact model
+* strongly typed lifecycle states
+* structured evidence records
+* deterministic integrity hashing
+* immutable collections
 
 ---
 
-## Finding 3 — Lifecycle State Uses Free Strings
+## Existing Enums
 
-### Current Risk
+Positive findings:
 
-Artifact status is uncontrolled text.
+`ArtifactType` already exists.
 
-### Why This Matters
+Current categories:
 
-Atlas lifecycle transitions represent capital risk decisions. Arbitrary strings allow invalid states.
+* Report
+* Strategy
+* Experiment
+* Review
+* Research
+* Regime
+* Portfolio
+* Workflow
+* Failure
 
-### Recommendation
+`EvidenceLevel` already exists:
 
-Create strongly typed lifecycle enums.
+* Research
+* Historical
+* Paper
+* Live
 
-Examples:
-
-- Draft
-- Research
-- Validation
-- Paper Trading
-- Promotion Review
-- Production
-
-Lifecycle transitions should be validated.
-
----
-
-## Finding 4 — Artifact Type Requires Formalization
-
-### Current Risk
-
-Artifact type is generic text.
-
-### Why This Matters
-
-As Atlas grows, different artifact classes will require different validation rules.
-
-### Recommendation
-
-Create ArtifactType definitions.
-
-Examples:
-
-- Research Artifact
-- Validation Report
-- Promotion Decision
-- Performance Report
-- Portfolio State
+These should be preserved and expanded.
 
 ---
 
-## Finding 5 — Validator Is Insufficient
+# Approved Implementation Direction
 
-### Current Risk
+The Artifact Framework will be upgraded into the evidence backbone of Atlas.
 
-Validator only checks required field presence.
-
-### Why This Matters
-
-Atlas requires evidence integrity, not just object completeness.
-
-### Recommendation
-
-Expand validation into layers:
-
-1. Schema validation
-2. Evidence validation
-3. Lifecycle validation
-4. Integrity validation
-5. Promotion eligibility validation
+No parallel Artifact system should be created.
 
 ---
 
-## Finding 6 — Serialization Needs Integrity Controls
+# Planned Implementation
 
-### Current Risk
+## Phase 1
 
-Serialization converts objects into YAML but does not enforce provenance or integrity.
+Refactor:
 
-### Why This Matters
-
-Serialized artifacts become the historical record of Atlas decisions.
-
-### Recommendation
+```
+framework/artifacts/enums.py
+```
 
 Add:
 
-- schema versioning
-- artifact hashing
-- migration strategy
-- integrity verification
+* Artifact lifecycle state model
+
+Replace simple status model with controlled progression:
+
+```
+DRAFT
+RESEARCH
+VALIDATION
+PAPER_TRADING
+PROMOTION_REVIEW
+LIMITED_CAPITAL
+PRODUCTION
+RETIRED
+```
 
 ---
 
-## Finding 7 — Repository Abstraction Needs Dependency Inversion
+## Phase 2
 
-### Current Risk
+Create:
 
-Repository directly creates its serializer dependency.
+```
+framework/artifacts/evidence.py
+```
 
-### Why This Matters
+Introduce:
 
-Future storage mechanisms may include databases, object storage, or event streams.
+`EvidenceRecord`
 
-### Recommendation
+Required fields:
 
-Inject serialization dependencies rather than hard-code implementations.
-
----
-
-# Recommended Remediation Sequence
-
-## Priority 1 — Freeze Core Contracts
-
-Implement:
-
-- immutable Artifact
-- Evidence model
-- ArtifactType enum
-- Lifecycle enum
-- artifact hashing
-
-Reason:
-
-Everything else in Atlas depends on these contracts.
+* source
+* methodology
+* evidence level
+* confidence
+* provenance
+* timestamp
+* hash
 
 ---
 
-## Priority 2 — Establish Governance Documents
+## Phase 3
 
-Create and maintain:
+Refactor:
 
-- CONSTITUTION.md
-- ARCHITECTURE.md
-- ROADMAP.md
-- DECISIONS.md
-- HANDOFF.md
+```
+framework/artifacts/artifact.py
+```
 
-Reason:
+Target model:
 
-Governance must precede capital-related automation.
+```
+Artifact
+├── id
+├── title
+├── type
+├── lifecycle
+├── evidence[]
+├── content
+├── metadata
+├── relationships
+├── version
+├── schema_version
+├── integrity_hash
+└── parent_hash
+```
 
----
-
-## Priority 3 — Add Test Infrastructure
-
-Required areas:
-
-- artifact creation
-- validation
-- serialization
-- persistence
-- lifecycle transitions
-
-Reason:
-
-The Artifact Framework is the trust boundary of the entire system.
+Artifact should become immutable.
 
 ---
 
-## Priority 4 — Continue Service Development
+## Phase 4
 
-Only after contracts are stable.
+Upgrade:
+
+```
+validator.py
+```
+
+Move from required-field checks to layered validation:
+
+* schema validation
+* evidence validation
+* lifecycle validation
+* integrity validation
+
+---
+
+## Phase 5
+
+Upgrade:
+
+```
+serializer.py
+```
+
+Add:
+
+* schema versioning
+* deterministic serialization
+* integrity preservation
+
+---
+
+## Phase 6
+
+Refactor:
+
+```
+repository.py
+```
+
+Introduce serializer dependency injection.
+
+Avoid repository-owned concrete serializer dependencies.
+
+---
+
+# Next Session Starting Point
+
+Begin implementation with:
+
+1. `framework/artifacts/enums.py`
+2. `framework/artifacts/evidence.py`
+3. `framework/artifacts/artifact.py`
+
+After those changes:
+
+* update factory
+* update validator
+* update serializer
+* update repository
+* add tests
+* repair downstream consumers
+
+---
+
+# Architectural Decisions
+
+Decision:
+
+The existing Artifact Framework is the correct architectural location.
+
+Decision:
+
+Do not create a replacement Artifact system.
+
+Decision:
+
+Artifacts become immutable evidence objects representing state transitions through Atlas.
+
+Decision:
+
+Evidence provenance and artifact lifecycle are first-class domain concepts.
+
+---
+
+# Outstanding Work
+
+* Implement Artifact refactor
+* Add evidence model
+* Add integrity hashing
+* Add validation pipeline
+* Add serialization guarantees
+* Add automated tests
+* Update architecture documentation after implementation
 
 ---
 
 # Highest Priority Next Task
 
-Refactor and formalize the Artifact Framework.
+Implement the first Artifact Framework refactor phase:
 
-Specifically:
-
-1. Create immutable Artifact model
-2. Introduce EvidenceRecord
-3. Introduce ArtifactType and Lifecycle enums
-4. Add validation architecture
-5. Add artifact integrity hashing
-6. Add tests
-
-Do not build additional services until this foundation is locked.
-
----
-
-# Continuation Prompt
-
-Atlas repository: pewpewpressco-ux/Atlas
-
-Continue from the completed engineering audit.
-
-GitHub is the source of truth.
-
-Before changes:
-
-1. Review AGENTS.md if present.
-2. Review docs/HANDOFF.md.
-3. Review docs/CONSTITUTION.md, docs/ARCHITECTURE.md, docs/ROADMAP.md, and docs/DECISIONS.md.
-
-Current state:
-
-Atlas has a foundational Artifact Framework, but it requires hardening before additional functionality.
-
-Next task:
-
-Refactor the Artifact Framework into the immutable evidence backbone of Atlas.
-
-Implement only after reviewing the repository:
-
-- immutable Artifact model
-- EvidenceRecord model
-- ArtifactType enum
-- Lifecycle enum
-- artifact hashing
-- validation pipeline
-- serialization integrity
-- repository dependency inversion
-- tests
-
-Maintain Atlas principles:
-
-- architecture before features
-- evidence before capital
-- deterministic behavior
-- immutable state transitions
-- explicit interfaces
-
-At session close:
-
-Update docs/HANDOFF.md with completed work, architectural decisions, remaining risks, and next priority.
+* typed lifecycle states
+* EvidenceRecord domain model
+* immutable Artifact object
