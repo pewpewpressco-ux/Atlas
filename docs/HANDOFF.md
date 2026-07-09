@@ -6,9 +6,9 @@ Repository:
 `pewpewpressco-ux/Atlas`
 
 Session focus:
-Artifact Framework modernization.
+Artifact Framework modernization verification and hardening.
 
-The existing Artifact Framework was preserved and upgraded. No parallel Artifact system was created.
+The existing Artifact Framework remains the canonical artifact boundary. No parallel Artifact system was created.
 
 ---
 
@@ -27,63 +27,103 @@ Completed:
 - Initial Artifact model tests
 - Artifact validator migration
 - Lifecycle transition validation
+- Canonical ArtifactIntegrity service
 
 ---
 
-# Validator Migration
+# Integrity Framework Verification
 
 Completed:
 
-`framework/artifacts/validator.py`
+- Reviewed ArtifactIntegrity ownership boundary
+- Confirmed deterministic artifact hashing is centralized
+- Confirmed ArtifactValidator delegates integrity verification
+- Confirmed validation policy remains separate from cryptographic implementation
 
-Added:
+Current integrity responsibilities:
 
-- required field validation
-- ArtifactLifecycle type validation
-- lifecycle transition validation
-- evidence hash presence validation
-- artifact integrity hash validation foundation
-
-Lifecycle governance now enforces controlled progression:
-
-```
-DRAFT
- |
-RESEARCH
- |
-VALIDATION
- |
-PAPER_TRADING
- |
-PROMOTION_REVIEW
- |
-LIMITED_CAPITAL
- |
-PRODUCTION
- |
-RETIRED
-```
+- canonical payload generation
+- deterministic serialization
+- SHA256 calculation
+- integrity verification
 
 ---
 
-# Testing
+# Architectural Findings
 
-Added:
+## Integrity Creation Boundary
 
-`tests/artifacts/test_lifecycle.py`
+Observation:
 
-Covered:
+Artifacts may currently exist without an integrity hash.
 
-- valid lifecycle transitions
-- invalid lifecycle regressions
-- production rollback prevention
-- retired artifact promotion prevention
+Recommendation:
 
-Remaining:
+Evaluate making integrity generation part of ArtifactFactory creation.
 
-- run complete repository test suite
-- verify downstream consumers
-- verify serializer compatibility
+Why:
+
+Factories are the controlled domain creation boundary and can prevent invalid artifact states before downstream workflows consume them.
+
+Risk if ignored:
+
+Unsigned artifacts may enter repositories, promotion workflows, and audit history.
+
+Priority:
+
+P1
+
+---
+
+## Evidence Hash Consolidation
+
+Observation:
+
+EvidenceRecord hashing may still be independently owned.
+
+Recommendation:
+
+Evaluate moving evidence hashing into a shared integrity primitive.
+
+Why:
+
+Artifact and evidence objects require deterministic integrity guarantees. Shared primitives reduce duplicated cryptographic behavior.
+
+Risk if ignored:
+
+Future governance artifacts may implement inconsistent integrity guarantees.
+
+Priority:
+
+P1
+
+---
+
+# Verification Remaining
+
+1. Inspect downstream Artifact consumers:
+
+- Artifact model
+- ArtifactFactory
+- EvidenceRecord
+- serializers
+- repositories
+- services
+
+2. Verify:
+
+- imports
+- serialization compatibility
+- immutable model behavior
+- lifecycle usage
+
+3. Inspect:
+
+- pytest configuration
+- CI workflows
+- package structure
+
+4. Run complete repository test suite.
 
 ---
 
@@ -109,7 +149,8 @@ Artifact lifecycle validation is a prerequisite foundation for EngineeringChange
 
 # Highest Priority Next Task
 
-1. Run complete repository verification
-2. Inspect downstream artifact consumers
+1. Complete Artifact Framework verification
+2. Inspect downstream consumers
 3. Verify serializer compatibility
-4. Continue Engineering Agent groundwork after Artifact Framework stabilization
+4. Run full test suite
+5. Continue Engineering Agent groundwork after Artifact Framework stabilization
