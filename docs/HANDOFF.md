@@ -147,10 +147,27 @@ Artifact lifecycle validation is a prerequisite foundation for EngineeringChange
 
 ---
 
+# Session Note - 2026-07-09
+
+## GitHub Connector Verification
+
+Completed:
+
+- Verified the GitHub connector can read canonical repository files from `pewpewpressco-ux/Atlas`.
+- Confirmed GitHub contains current governance files not present in the stale local checkout, including `docs/DECISIONS.md` and `docs/ENGINEERING_AGENT.md`.
+- Confirmed local `git` is unavailable in the current shell, so local pull/sync could not be completed from this environment.
+- Treated GitHub as the canonical source of truth for this session.
+
+Current working note:
+
+The local folder at `C:\Users\joshu\Documents\GitHub\Atlas` is behind GitHub and should be refreshed once a working Git client is available. Until then, connector reads from GitHub are more reliable than local file reads.
+
+---
+
 # Highest Priority Next Task
 
-1. Complete Artifact Framework verification
+1. Complete Artifact Framework verification against GitHub canonical state
 2. Inspect downstream consumers
 3. Verify serializer compatibility
-4. Run full test suite
+4. Run full test suite once local checkout and Git tooling are available
 5. Continue Engineering Agent groundwork after Artifact Framework stabilization
