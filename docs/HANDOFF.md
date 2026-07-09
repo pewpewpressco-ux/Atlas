@@ -25,117 +25,65 @@ Completed:
 - ArtifactSerializer migration
 - ArtifactRepository serializer dependency injection
 - Initial Artifact model tests
+- Artifact validator migration
+- Lifecycle transition validation
 
 ---
 
-# Implemented Components
-
-## framework/artifacts/enums.py
+# Validator Migration
 
 Completed:
 
-- Preserved ArtifactType
-- Preserved EvidenceLevel
-- Replaced ArtifactStatus with ArtifactLifecycle
+`framework/artifacts/validator.py`
 
-Lifecycle states:
+Added:
+
+- required field validation
+- ArtifactLifecycle type validation
+- lifecycle transition validation
+- evidence hash presence validation
+- artifact integrity hash validation foundation
+
+Lifecycle governance now enforces controlled progression:
 
 ```
 DRAFT
+ |
 RESEARCH
+ |
 VALIDATION
+ |
 PAPER_TRADING
+ |
 PROMOTION_REVIEW
+ |
 LIMITED_CAPITAL
+ |
 PRODUCTION
+ |
 RETIRED
 ```
 
 ---
 
-## framework/artifacts/evidence.py
+# Testing
 
 Added:
 
-`EvidenceRecord`
+`tests/artifacts/test_lifecycle.py`
 
-Fields:
+Covered:
 
-- source
-- methodology
-- evidence level
-- confidence
-- provenance
-- timestamp
-- hash
+- valid lifecycle transitions
+- invalid lifecycle regressions
+- production rollback prevention
+- retired artifact promotion prevention
 
-Evidence provenance is now a first-class domain concept.
+Remaining:
 
----
-
-## framework/artifacts/artifact.py
-
-Artifact model upgraded:
-
-```
-Artifact
-├── id
-├── title
-├── type
-├── lifecycle
-├── evidence[]
-├── content
-├── metadata
-├── relationships
-├── version
-├── schema_version
-├── integrity_hash
-└── parent_hash
-```
-
-Artifact is immutable.
-
----
-
-# Supporting Infrastructure
-
-Completed:
-
-- Factory constructor migration
-- Immutable collection serialization support
-- Enum serialization support
-- Repository serializer dependency injection
-
----
-
-# Outstanding Work
-
-## Validator Migration
-
-Pending:
-
-`framework/artifacts/validator.py`
-
-Required:
-
-- lifecycle validation
-- evidence validation
-- integrity validation
-
----
-
-## Testing
-
-Completed:
-
-- Artifact immutability test
-- Evidence hash generation test
-
-Pending:
-
-- lifecycle transition validation tests
-- invalid lifecycle regression tests
-- full repository verification
+- run complete repository test suite
+- verify downstream consumers
+- verify serializer compatibility
 
 ---
 
@@ -147,13 +95,21 @@ No replacement Artifact system should be created.
 
 Artifacts represent immutable evidence objects progressing through controlled lifecycle states.
 
-Evidence provenance, confidence, and integrity are first-class concepts.
+Evidence provenance, confidence, and integrity remain first-class concepts.
+
+---
+
+# Engineering Agent Roadmap
+
+The Engineering Agent remains a future governed automation layer.
+
+Artifact lifecycle validation is a prerequisite foundation for EngineeringChange artifacts and autonomous software governance.
 
 ---
 
 # Highest Priority Next Task
 
-1. Resolve validator migration
-2. Add lifecycle transition validation
-3. Run complete test suite
-4. Complete repository verification
+1. Run complete repository verification
+2. Inspect downstream artifact consumers
+3. Verify serializer compatibility
+4. Continue Engineering Agent groundwork after Artifact Framework stabilization
