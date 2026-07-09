@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import hashlib
-import json
-
 from framework.artifacts.artifact import Artifact
 from framework.artifacts.enums import ArtifactLifecycle
+from framework.artifacts.integrity import ArtifactIntegrity
 
 
 class ArtifactValidator:
@@ -62,18 +60,5 @@ class ArtifactValidator:
         if artifact.integrity_hash is None:
             return
 
-        payload = {
-            "id": artifact.id,
-            "title": artifact.title,
-            "type": artifact.type.value,
-            "lifecycle": artifact.lifecycle.value,
-            "version": artifact.version,
-            "schema_version": artifact.schema_version,
-        }
-
-        digest = hashlib.sha256(
-            json.dumps(payload, sort_keys=True).encode("utf-8")
-        ).hexdigest()
-
-        if digest != artifact.integrity_hash:
+        if not ArtifactIntegrity.verify_hash(artifact):
             raise ValueError("Artifact integrity hash mismatch.")
