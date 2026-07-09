@@ -4,32 +4,24 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
+from framework.artifacts.enums import ArtifactLifecycle, ArtifactType
+from framework.artifacts.evidence import EvidenceRecord
 
-@dataclass(slots=True)
+
+@dataclass(frozen=True, slots=True)
 class Artifact:
-
     id: str
-
     title: str
-
-    type: str
-
+    type: ArtifactType
+    lifecycle: ArtifactLifecycle = ArtifactLifecycle.DRAFT
+    evidence: tuple[EvidenceRecord, ...] = field(default_factory=tuple)
     version: str = "1.0.0"
-
-    status: str = "Draft"
-
-    evidence: str = "D"
-
+    schema_version: str = "1.0"
     created: datetime = field(default_factory=datetime.utcnow)
-
     updated: datetime = field(default_factory=datetime.utcnow)
-
     author: str = "Atlas"
-
-    tags: list[str] = field(default_factory=list)
-
-    relationships: dict[str, list[str]] = field(default_factory=dict)
-
-    metadata: dict[str, Any] = field(default_factory=dict)
-
-    content: dict[str, Any] = field(default_factory=dict)
+    relationships: tuple[tuple[str, tuple[str, ...]], ...] = field(default_factory=tuple)
+    metadata: tuple[tuple[str, Any], ...] = field(default_factory=tuple)
+    content: tuple[tuple[str, Any], ...] = field(default_factory=tuple)
+    integrity_hash: str | None = None
+    parent_hash: str | None = None
