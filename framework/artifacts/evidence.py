@@ -40,4 +40,13 @@ class EvidenceRecord:
         digest = hashlib.sha256(
             json.dumps(payload, sort_keys=True).encode("utf-8")
         ).hexdigest()
-        return cls(hash=digest, timestamp=timestamp, **payload)
+
+        return cls(
+            source=source,
+            methodology=methodology,
+            level=level,
+            confidence=confidence,
+            provenance=provenance,
+            timestamp=timestamp,
+            hash=digest,
+        )
